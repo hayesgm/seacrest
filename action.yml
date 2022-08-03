@@ -9,7 +9,5 @@ runs:
   steps:
     - run: npm install
       shell: bash
-    - run: node src/action.mjs
+    - run: node src/index.mjs ${{ inputs.ethereum }}
       shell: bash
-      with:
-        ethereum: ${{ inputs.ethereum }}
