@@ -11,3 +11,5 @@ runs:
       shell: bash
     - run: node src/action.mjs
       shell: bash
+      with:
+        ethereum: ${{ inputs.ethereum }}
