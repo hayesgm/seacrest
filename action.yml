@@ -1,0 +1,9 @@
+name: 'Seacrest WalletConnect'
+description: 'Boot a Seacrest WalletConnect Server'
+inputs:
+  ethereum:
+    description: 'Ethereum node to proxy requests to'
+    required: true
+runs:
+  using: 'node16'
+  main: 'src/action.mjs'

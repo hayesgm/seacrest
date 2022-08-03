@@ -1,0 +1,18 @@
+name: Test Local Action
+
+on:
+  pull_request:
+
+jobs:
+  check:
+    name: Test Local Seacrest Action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Run Seacrest
+        uses: ./
+        with:
+          ethereum: https://goerli.infura.io
