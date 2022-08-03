@@ -5,5 +5,9 @@ inputs:
     description: 'Ethereum node to proxy requests to'
     required: true
 runs:
-  using: 'node16'
-  main: 'src/action.mjs'
+  using: "composite"
+  steps:
+    - run: npm install
+      shell: bash
+    - run: src/action.mjs
+      shell: node16
