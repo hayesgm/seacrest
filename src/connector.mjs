@@ -1,6 +1,8 @@
 import NodeWalletConnect from "@walletconnect/node";
 import qrcode from "qrcode-terminal";
 
+const reshowDelay = 10000;
+
 const networks = {
   1: "mainnet",
   5: "goerli",
@@ -14,6 +16,15 @@ export async function getWalletConnector() {
     resolve = resolve_;
     reject = reject_;
   });
+  let attempted = false;
+
+  function showUntilAttempted(uri) {
+    if (!attempted) {
+      console.info(`\n\n[Seacrest][WalletConnect] Please navigate to url:\n\n${uri}\n\nor visit QR code:\n`);
+      qrcode.generate(uri, {small: true});
+      setTimeout(() => showUntilAttempted(uri), reshowDelay);
+    }
+  }
 
   const walletConnector = new NodeWalletConnect.default(
     {
@@ -35,13 +46,13 @@ export async function getWalletConnector() {
     walletConnector.createSession().then(() => {
       // Get uri for QR Code modal
       const uri = walletConnector.uri;
-      console.info(`[Seacrest][WalletConnect] Please navigate to url:\n\n${uri}\n\nor visit QR code:\n`);
-      qrcode.generate(uri, {small: true});
+      showUntilAttempted(uri);
     });
   }
 
   // Subscribe to connection events
   walletConnector.on("connect", (error, payload) => {
+    attempted = true;
     if (error) {
       reject(error);
     }
