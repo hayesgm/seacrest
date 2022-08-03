@@ -7,6 +7,6 @@ if (!host) {
 if (!host.startsWith("http")) {
   throw new Error(`Expected host to start with http, got: ${host}`);
 }
-const port = process.env["PORT"] || 8585;
+const port = Number(process.argv[3] || process.env["PORT"] || 8585);
 
 startServer(host, port);

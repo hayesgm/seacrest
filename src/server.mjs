@@ -89,7 +89,6 @@ export async function startServer(host, port) {
   http
     .createServer(async (request, response) => {
       let reqBody = await getReqBody(request);
-      console.log({reqBody});
       let requestJson;
       try {
         requestJson = JSON.parse(reqBody);

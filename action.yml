@@ -1,17 +1,21 @@
-name: 'Seacrest WalletConnect'
-description: 'Boot a Seacrest WalletConnect Server'
+name: "Seacrest WalletConnect"
+description: "Boot a Seacrest WalletConnect Server"
 inputs:
-  ethereum:
-    description: 'Ethereum node to proxy requests to'
+  ethereum_url:
+    description: "Ethereum node to proxy requests to"
     required: true
+  port:
+    description: "Port to host proxy on"
+    required: true
+    default: 8585
 runs:
   using: "composite"
   steps:
     - run: |
         npm install
-        node src/index.mjs ${{ inputs.ethereum }} &
-        while ! nc -z localhost 8585; do
+        node src/index.mjs "${{ inputs.ethereum_url }}" "${{ inputs.port }}" &
+        while ! nc -z localhost "${{ inputs.port }}"; do
           sleep 0.1
         done
-        curl -S -s -i http://localhost:8585 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":1}'
+        curl -S -s -i "http://localhost:${{ inputs.port }}" -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":1}'
       shell: bash

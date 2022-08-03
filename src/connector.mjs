@@ -20,8 +20,10 @@ export async function getWalletConnector() {
 
   function showUntilAttempted(uri) {
     if (!attempted) {
-      console.info(`\n\n[Seacrest][WalletConnect] Please navigate to url:\n\n${uri}\n\nor visit QR code:\n`);
-      qrcode.generate(uri, {small: true});
+      console.info(
+        `\n\n[Seacrest][WalletConnect] Please navigate to url:\n\n${uri}\n\nor visit QR code:\n`
+      );
+      qrcode.generate(uri, { small: true });
       setTimeout(() => showUntilAttempted(uri), reshowDelay);
     }
   }
