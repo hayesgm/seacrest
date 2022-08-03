@@ -8,11 +8,10 @@ runs:
   using: "composite"
   steps:
     - run: |
-        set -x
         npm install
         node src/index.mjs ${{ inputs.ethereum }} &
         while ! nc -z localhost 8585; do
           sleep 0.1
         done
-        curl -i http://localhost:8585 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":1}'
+        curl -S -s -i http://localhost:8585 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":1}'
       shell: bash
