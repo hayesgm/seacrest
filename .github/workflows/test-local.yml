@@ -1,0 +1,23 @@
+name: Test Local Action
+
+on:
+  pull_request:
+
+jobs:
+  check:
+    name: Test Local Seacrest Action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Run Seacrest
+        uses: ./
+        with:
+          ethereum_url: https://goerli.infura.io
+
+      - name: Check Account
+        run: |
+          curl -i http://localhost:8585 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":2}'
+          curl -i http://localhost:8585 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"net_version","params":[],"id":3}'

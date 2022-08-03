@@ -1,0 +1,19 @@
+{
+  "name": "seacrest",
+  "type": "module",
+  "version": "0.0.2",
+  "description": "WalletConnect over the terminal or GitHub Actions",
+  "main": "src/index.mjs",
+  "scripts": {
+    "start": "node src/index.mjs"
+  },
+  "author": "Geoffrey Hayes, Compound Labs, Inc.",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.9.0",
+    "@walletconnect/node": "^1.0.0",
+    "node-fetch": "^3.2.10",
+    "qrcode-terminal": "^0.12.0",
+    "tslib": "^2.4.0"
+  }
+}
