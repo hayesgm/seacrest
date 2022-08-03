@@ -9,5 +9,5 @@ runs:
   steps:
     - run: npm install
       shell: bash
-    - run: src/action.mjs
-      shell: node16
+    - run: node src/action.mjs
+      shell: bash
