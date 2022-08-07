@@ -8,13 +8,15 @@ inputs:
     description: "Port to host proxy on"
     required: true
     default: 8585
+  requested_network:
+    description: "Requested network to connect to"
 runs:
   using: "composite"
   steps:
     - run: |
         cd ${{ github.action_path }}
         npm install
-        node src/index.mjs "${{ inputs.ethereum_url }}" "${{ inputs.port }}" &
+        LARGE=false RESHOW_DELAY=10000 REQUESTED_NETWORK="${{ inputs.network }}" node src/index.mjs "${{ inputs.ethereum_url }}" "${{ inputs.port }}" &
         while ! nc -z localhost "${{ inputs.port }}"; do
           sleep 0.1
         done
