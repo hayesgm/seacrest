@@ -4,8 +4,6 @@ import path from "path";
 import fetch from "node-fetch";
 import { getWalletConnector } from "./connector.mjs";
 
-const walletConnectorPromise = getWalletConnector();
-
 async function eth_sendTransaction(
   chainId,
   accounts,
@@ -73,7 +71,9 @@ async function sendJson(response, json) {
   response.end();
 }
 
-export async function startServer(host, port) {
+export async function startServer(host, port, connectOpts={}) {
+  const walletConnectorPromise = getWalletConnector(connectOpts);
+
   http
     .createServer(async (request, response) => {
       let reqBody = await getReqBody(request);
