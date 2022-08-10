@@ -49,7 +49,7 @@ Secondly, you could use this as an authorization flow in GitHub Actions, e.g. to
 
 ## Contributing
 
-Create a PR to contribute to Signet. All contributors agree to accept the license specified in this repository for all contributions to this project. See [LICENSE.md](/LICENSE.md).
+Create a PR to contribute to Seacrest. All contributors agree to accept the license specified in this repository for all contributions to this project. See [LICENSE.md](/LICENSE.md).
 
 Feel free to create Feature Requests in the issues.
 
