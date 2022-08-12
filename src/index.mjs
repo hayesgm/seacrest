@@ -2,7 +2,7 @@ import { startServer } from "./server.mjs";
 
 const host = process.argv[2] || process.env["ETHEREUM_URL"];
 if (!host) {
-  throw new Error("Missing required ETHEREUM_URL");
+  host = 'https://mainnet.infura.io';
 }
 if (!host.startsWith("http")) {
   throw new Error(`Expected host to start with http, got: ${host}`);

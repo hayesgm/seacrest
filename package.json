@@ -1,9 +1,12 @@
 {
   "name": "seacrest",
   "type": "module",
-  "version": "0.0.2",
+  "version": "1.2.0",
   "description": "WalletConnect over the terminal or GitHub Actions",
   "main": "src/index.mjs",
+  "bin": {
+    "seacrest": "src/index.mjs"
+  },
   "scripts": {
     "start": "node src/index.mjs"
   },

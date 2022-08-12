@@ -23,7 +23,7 @@ Next, run seacrest, specifying an Ethereum node to proxy requests to:
 seacrest http://goerli.infura.io 8585
 ```
 
-Now, you can specify `http://localhost:8585` as your Ethereum node in any service. If that service requests..
+Now, you can specify `http://localhost:8585` as your Ethereum node in any service. If that service calls `eth_accounts`, `eth_sendTransaction`, `net_version`, or `personal_sign`, that request will be intercepted by Seacrest and passed to WalletConnect. Otherwise, the request will be proxied the given Ethereum node.
 
 ### GitHub Actions
 
@@ -33,17 +33,27 @@ Seacrest is also meant to be easily used in a GitHub Action. Add to your YAML fi
 - name: Seacrest
   uses: hayesgm/seacrest@v1
   with:
-    ethereum_url: https://goerli.infura.io
-    port: 8585
+    ethereum_url: https://goerli.infura.io # optional, otherwise mainnet
+    port: 8585 # default 8585
 ```
 
 You will need to pull into your logs *when the action is running* and connect your wallet. Pull into the action log and scan the QR code. It's a little finnicky, but it should work.
 
 Subsequently, you can simply use `http://localhost:8585` as your Ethereum node. Any requests for accounts or signatures will be redirected to WalletConnect. For instance, you could deploy scripts from Hardhat using this node, with the security of WalletConnect but the ease and transparency of GitHub Actions.
 
+### Configuration
+
+You can configure the following values from the environment:
+
+* `ETHEREUM_URL`: Ethereum node to proxy to
+* `PORT`: Port to bind on
+* `LARGE`: Show full size QR code or compact
+* `RESHOW_DELAY`: Reshow the QR code every so often (used in GitHub Actions)
+* `REQUESTED_NETWORK`: Network to try to connect with- will fail if user connects to wrong network.
+
 ## Why?
 
-First, for fun and profit. But moreso, there's value in interacting and deploying Ethereum contracts in plain sight. But that's hard to do since most people don't want to share private keys with GitHub Secrets, even if they are throwaways. This gives developers the option to securely sign transactions _in public_.
+First, for fun ~~and profit~~. Moreso, there's value in interacting and deploying Ethereum contracts in plain sight. But that's hard to do since most people don't want to share private keys with GitHub Secrets, even if they are throw-aways. This gives developers the option to securely sign transactions _in public_.
 
 Secondly, you could use this as an authorization flow in GitHub Actions, e.g. to unlock other secrets or anything else. It is the first "human in the loop" authorization action that I know of.
 
