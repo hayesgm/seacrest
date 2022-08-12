@@ -1,13 +1,16 @@
+#!/bin/sh
+":" //# comment; exec /usr/bin/env node --noharmony "$0" "$@"
 import { startServer } from "./server.mjs";
 
-const host = process.argv[2] || process.env["ETHEREUM_URL"];
-if (!host) {
-  host = 'https://mainnet.infura.io';
-}
+let host = process.argv[2] || process.env["ETHEREUM_URL"] || 'https://mainnet.infura.io';
 if (!host.startsWith("http")) {
   throw new Error(`Expected host to start with http, got: ${host}`);
 }
-const port = Number(process.argv[3] || process.env["PORT"] || 8585);
+const portStr = process.argv[3] || process.env["PORT"] || 8585;
+const port = Number(portStr);
+if (Number.isNaN(port)) {
+  throw new Error(`Invalid port ${portStr}`);
+}
 let connectOpts = {};
 if (process.env["LARGE"] === "false") {
   connectOpts.large = false;
