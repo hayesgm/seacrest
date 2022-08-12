@@ -21,10 +21,18 @@ async function eth_accounts(chainId, accounts, walletConnector, []) {
   return accounts;
 }
 
+async function personal_sign(chainId, accounts, walletConnector, [message, account]) {
+  return await walletConnector.signPersonalMessage([
+    message,
+    account
+  ]);
+}
+
 const rpcFuncs = {
   eth_sendTransaction,
   net_version,
   eth_accounts,
+  personal_sign
 };
 
 function getReqBody(req) {

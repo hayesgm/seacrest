@@ -4,6 +4,7 @@ inputs:
   ethereum_url:
     description: "Ethereum node to proxy requests to"
     required: true
+    default: "https://mainnet.infura.io"
   port:
     description: "Port to host proxy on"
     required: true
