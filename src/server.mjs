@@ -46,9 +46,8 @@ function getReqBody(req) {
 
 async function proxy(host, request, reqBody, response) {
   let pathname = url.parse(request.url).pathname;
-  pathname = pathname === "/" ? "" : pathname; // to avoid a trailing slash
   let hostname = url.parse(host).host;
-  let proxyUrl = `${host}${pathname}`;
+  let proxyUrl = `${host}${pathname}`.replace(/\/+$/, ""); // remove trailing slashes
   let reqMethod = request.method;
   let reqHeaders = {
     ...request.headers,
