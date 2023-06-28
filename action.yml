@@ -28,7 +28,7 @@ runs:
         curl -S -s -i "http://localhost:${{ inputs.port }}" -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":1}'
       shell: bash
       env:
-        WALLET_CONNECT_PROJECT_ID: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
+        WALLET_CONNECT_PROJECT_ID: "${{ secrets.WALLET_CONNECT_PROJECT_ID }}"
 branding:
   icon: 'server'
   color: 'yellow'
