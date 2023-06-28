@@ -22,7 +22,7 @@ async function eth_accounts(session, chainId, accounts, walletConnector, []) {
 }
 
 async function personal_sign(session, chainId, accounts, walletConnector, params) {
-  return await signClient.request({
+  let x = await signClient.request({
     topic: session.topic,
     chainId: `eip155:${chainId}`,
     request: {
@@ -30,6 +30,8 @@ async function personal_sign(session, chainId, accounts, walletConnector, params
       params,
     }
   });
+  console.log({x});
+  return x;
 }
 
 const rpcFuncs = {
