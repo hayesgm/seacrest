@@ -19,7 +19,7 @@ inputs:
   persist_pairing:
     description: "Persist pairings to make it easier to reconnect"
     type: boolean
-    default: true
+    default: false
 runs:
   using: "composite"
   steps:
