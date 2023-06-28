@@ -9,7 +9,7 @@ const networks = {
 export async function getWalletConnector(walletConnectProjectId, relayUrl, requestedNetwork, connectOpts={}) {
   const opts = {
     reshowDelay: null,
-    uriTimeout: 60000,
+    uriTimeout: 120000,
     retries: 10,
     large: true,
     ...connectOpts
