@@ -28,7 +28,6 @@ runs:
       with:
         path: "${{ github.actor }}-pairing"
         key: "${{ github.actor }}-pairing"
-      if: "${{ github.event.inputs.persist_pairing == true }}"
     - run: |
         cd ${{ github.action_path }}
         npm install
@@ -44,7 +43,6 @@ runs:
       with:
         path: "${{ github.actor }}-pairing"
         key: "${{ github.actor }}-pairing"
-      if: "${{ github.event.inputs.persist_pairing == true }}"
 branding:
   icon: 'server'
   color: 'yellow'
