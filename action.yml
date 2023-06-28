@@ -22,7 +22,7 @@ runs:
     - run: |
         cd ${{ github.action_path }}
         npm install
-        LARGE=false RESHOW_DELAY=10000 REQUESTED_NETWORK="${{ inputs.network }}" node src/index.mjs "${{ inputs.ethereum_url }}" "${{ inputs.port }}" "${{ inputs.requested_network }}" "${{ inputs.wallet_connect_project_id }}" &
+        LARGE=false RESHOW_DELAY=10000 node src/index.mjs "${{ inputs.requested_network }}" "${{ inputs.wallet_connect_project_id }}" "${{ inputs.ethereum_url }}" "${{ inputs.port }}" &
         while ! nc -z localhost "${{ inputs.port }}"; do
           sleep 0.1
         done
