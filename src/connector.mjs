@@ -119,11 +119,6 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
       }).then(({ uri, approval }) => {
         // Get uri for QR Code modal
         approval().then((session) => {
-          console.log(session);
-          console.log(session.namespaces.eip155);
-          console.log(signClient);
-          console.log(signClient.core.storage);
-          console.log(signClient.core.storage.db);
           let chainAccounts = session.namespaces.eip155.accounts.map((d) => {
             let [_, chainId, account] = d.split(':');
             return { chainId: Number(chainId), account };
@@ -171,7 +166,6 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
     });
 
     signClient.on("session_update", (payload) => {
-      console.log(payload);
       console.error(
         `[Seacrest][WalletConnect] Error: changed session.`
       );
