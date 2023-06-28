@@ -27,7 +27,7 @@ async function personal_sign(session, chainId, accounts, walletConnector, params
     chainId: `eip155:${chainId}`,
     request: {
       method: "personal_sign",
-      params,
+      params: params.length === 1 ? [params[0], accounts[0]] : params,
     }
   });
   console.log({x});
