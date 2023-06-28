@@ -15,6 +15,7 @@ inputs:
     default: 1
   wallet_connect_project_id:
     description: "Your WalletConnect project id [defaults to secret WALLET_CONNECT_PROJECT_ID]"
+    required: true
 runs:
   using: "composite"
   steps:
@@ -27,8 +28,6 @@ runs:
         done
         curl -S -s -i "http://localhost:${{ inputs.port }}" -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":1}'
       shell: bash
-      env:
-        WALLET_CONNECT_PROJECT_ID: "${{ secrets.WALLET_CONNECT_PROJECT_ID }}"
 branding:
   icon: 'server'
   color: 'yellow'

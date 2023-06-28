@@ -16,6 +16,7 @@ jobs:
         uses: ./
         with:
           ethereum_url: https://goerli.infura.io
+          wallet_connect_project_id: "${{ secrets.WALLET_CONNECT_PROJECT_ID }}"
 
       - name: Check Account
         run: |
