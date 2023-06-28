@@ -106,7 +106,8 @@ export async function startServer(host, port, walletConnectProjectId, requestedN
         let { chainId, accounts, walletConnector } =
           await walletConnectorPromise;
         let handlerRes = await handler(
-          chainAccounts,
+          chainId,
+          accounts,
           walletConnector,
           requestJson.params
         );
