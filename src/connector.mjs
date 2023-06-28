@@ -114,7 +114,7 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
               )}`
             );
 
-            resolve({ signClient, chainId: requestedNetwork, accounts });
+            resolve({ signClient, session, chainId: requestedNetwork, accounts });
           }
         });
         
