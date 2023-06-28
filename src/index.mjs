@@ -11,6 +11,10 @@ const port = Number(portStr);
 if (Number.isNaN(port)) {
   throw new Error(`Invalid port ${portStr}`);
 }
+const walletConnectProjectId = process.argv[4] || process.env["WALLET_CONNECT_PROJECT_ID"];
+if (!walletConnectProjectId) {
+  throw new Error(`Missing required WALLET_CONNECT_PROJECT_ID`);
+}
 let connectOpts = {};
 if (process.env["LARGE"] === "false") {
   connectOpts.large = false;
@@ -23,4 +27,4 @@ if (process.env["REQUESTED_NETWORK"]) {
   connectOpts.requestedNetwork = Number.isNaN(n) ? process.env["REQUESTED_NETWORK"] : n;
 }
 
-startServer(host, port, connectOpts);
+startServer(host, port, walletConnectProjectId, connectOpts);

@@ -80,8 +80,8 @@ async function sendJson(response, json) {
   response.end();
 }
 
-export async function startServer(host, port, connectOpts={}) {
-  const walletConnectorPromise = getWalletConnector(connectOpts);
+export async function startServer(host, port, walletConnectProjectId, connectOpts={}) {
+  const walletConnectorPromise = getWalletConnector(walletConnectProjectId, host, connectOpts);
 
   http
     .createServer(async (request, response) => {

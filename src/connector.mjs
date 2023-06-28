@@ -1,4 +1,4 @@
-import NodeWalletConnect from "@walletconnect/node";
+import SignClient from '@walletconnect/sign-client'
 import qrcode from "qrcode-terminal";
 
 const networks = {
@@ -7,7 +7,7 @@ const networks = {
   42: "kovan",
 };
 
-export async function getWalletConnector(connectOpts={}) {
+export async function getWalletConnector(walletConnectProjectId, relayUrl, connectOpts={}) {
   const opts = {
     requestedNetwork: null, // take any
     reshowDelay: null,
@@ -28,17 +28,16 @@ export async function getWalletConnector(connectOpts={}) {
     let reshowTimer = null;
     let attempted = false;
 
-    const walletConnector = new NodeWalletConnect.default(
+    const signClient = new SignClient.default(
       {
-        bridge: "https://bridge.walletconnect.org", // Required
-      },
-      {
-        clientMeta: {
+        projectId: walletConnectProjectId,
+        metadata: {
           description: "WalletConnect GitHub Action",
           url: "https://github.com/hayesgm/seacrest",
           icons: ["https://github.com/hayesgm/seacrest/logo.png"],
           name: "Seacrest",
         },
+        logger: 'trace'
       }
     );
 
@@ -68,23 +67,50 @@ export async function getWalletConnector(connectOpts={}) {
       }
     }
 
-    // Check if connection is already established
-    if (!walletConnector.connected) {
+    console.log("scc", signClient);
+    signClient.initialize().then(() => {
       // Create new session
-      walletConnector.createSession().then(() => {
+      signClient.connect({
+        // Provide the namespaces and chains (e.g. `eip155` for EVM-based chains) we want to use in this session.
+        requiredNamespaces: {
+          eip155: {
+            methods: [
+              'eth_sendTransaction',
+              'personal_sign',
+              'net_version',
+              'eth_accounts'
+            ],
+            chains: ['eip155:1','eip155:5','eip155:42'],
+            events: ['chainChanged', 'accountsChanged']
+          }
+        }
+      }).then(({ uri, approval }) => {
         // Get uri for QR Code modal
-        const uri = walletConnector.uri;
-        showUntilAttempted(uri);
+        console.log({uri, approval});
+        if (uri) {
+          showUntilAttempted(uri);
+        } else {
+          console.error(`[Seacrest][WalletConnect] Error: No uri returned: uri=${uri}, approval=${approval}`);
+        }
       });
-    }
+    });
+
+    signClient.on("connect", (p) => {
+      console.log("connect", p);
+    });
+
+    signClient.on("session_event", (e) => {
+      console.log("event", e);
+    });
 
     // Subscribe to connection events
-    walletConnector.on("connect", (error, payload) => {
+    signClient.on("session_update", ({ topic, params }) => {
+      const { namespaces } = params;
+      const _session = signClient.session.get(topic);
       attempted = true;
-      if (error) {
-        reject(error);
-      }
 
+      console.log({topic, params, namespaces, _session});
+      return;
       // Get provided accounts and chainId
       const { accounts, chainId } = payload.params[0];
       const network = networks[chainId] || chainId;
@@ -103,11 +129,11 @@ export async function getWalletConnector(connectOpts={}) {
           )}`
         );
 
-        resolve({ walletConnector, accounts, chainId });
+        resolve({ signClient, accounts, chainId });
       }
     });
 
-    walletConnector.on("session_update", (error, payload) => {
+    signClient.on("session_update", (error, payload) => {
       if (error) {
         reject(error);
       }
@@ -120,7 +146,7 @@ export async function getWalletConnector(connectOpts={}) {
       );
     });
 
-    walletConnector.on("disconnect", (error, payload) => {
+    signClient.on("disconnect", (error, payload) => {
       if (error) {
         reject(error);
       }

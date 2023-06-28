@@ -11,6 +11,8 @@ inputs:
     default: 8585
   requested_network:
     description: "Requested network to connect to"
+  wallet_connect_project_id:
+    description: "Your WalletConnect project id"
 runs:
   using: "composite"
   steps:
