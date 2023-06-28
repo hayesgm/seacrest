@@ -2,20 +2,26 @@ import SignClient from '@walletconnect/sign-client'
 import qrcode from "qrcode-terminal";
 
 const networks = {
-  1: "mainnet",
-  5: "goerli",
-  42: "kovan",
+  'mainnet': 1,
+  'goerli': 5
 };
 
-export async function getWalletConnector(walletConnectProjectId, relayUrl, connectOpts={}) {
+export async function getWalletConnector(walletConnectProjectId, relayUrl, requestedNetwork, connectOpts={}) {
   const opts = {
-    requestedNetwork: null, // take any
     reshowDelay: null,
     uriTimeout: 60000,
     retries: 10,
     large: true,
     ...connectOpts
   };
+
+  if (typeof(requestedNetwork) === 'string') {
+    if (requestedNetwork in networks) {
+      requestedNetwork = networks[requestedNetwork];
+    } else {
+      throw new Error(`Invalid or unknown Seacrest network: ${requestedNetwork}`);
+    }
+  }
 
   let resolve;
   let reject;
@@ -36,8 +42,7 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, conne
           url: "https://github.com/hayesgm/seacrest",
           icons: ["https://github.com/hayesgm/seacrest/logo.png"],
           name: "Seacrest",
-        },
-        logger: 'trace'
+        }
       }
     );
 
@@ -67,7 +72,6 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, conne
       }
     }
 
-    console.log("scc", signClient);
     signClient.initialize().then(() => {
       // Create new session
       signClient.connect({
@@ -80,13 +84,40 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, conne
               'net_version',
               'eth_accounts'
             ],
-            chains: ['eip155:1','eip155:5','eip155:42'],
+            chains: [`eip155:${requestedNetwork}`],
             events: ['chainChanged', 'accountsChanged']
           }
         }
       }).then(({ uri, approval }) => {
         // Get uri for QR Code modal
-        console.log({uri, approval});
+        approval().then((session) => {
+          let chainAccounts = session.namespaces.eip155.accounts.map((d) => {
+            let [_, chainId, account] = d.split(':');
+            return { chainId: Number(chainId), account };
+          });
+          let matchingChainAccounts = chainAccounts
+            .filter(({chainId}) => requestedNetwork === chainId)
+          attempted = true;
+
+          if (matchingChainAccounts.length === 0) {
+            console.info(
+            `[Seacrest][WalletConnect] Error: connected to Seacrest with accounts ${JSON.stringify(chainAccounts)}, but requested network "${requestedNetwork}". Please change networks and try again.`
+            );
+
+            // Wait 5 seconds to give user a moment to read before another QR code pops in
+            setTimeout(() => connect(resolve, reject, retries), 5000);
+          } else {
+            let accounts = matchingChainAccounts.map(({account}) => account);
+            console.info(
+            `[Seacrest][WalletConnect] Connected to Seacrest with accounts ${JSON.stringify(
+                accounts
+              )}`
+            );
+
+            resolve({ signClient, chainId: requestedNetwork, accounts });
+          }
+        });
+        
         if (uri) {
           showUntilAttempted(uri);
         } else {
@@ -95,61 +126,13 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, conne
       });
     });
 
-    signClient.on("connect", (p) => {
-      console.log("connect", p);
-    });
-
-    signClient.on("session_event", (e) => {
-      console.log("event", e);
-    });
-
-    // Subscribe to connection events
-    signClient.on("session_update", ({ topic, params }) => {
-      const { namespaces } = params;
-      const _session = signClient.session.get(topic);
-      attempted = true;
-
-      console.log({topic, params, namespaces, _session});
-      return;
-      // Get provided accounts and chainId
-      const { accounts, chainId } = payload.params[0];
-      const network = networks[chainId] || chainId;
-
-      if (opts.requestedNetwork && chainId !== opts.requestedNetwork && network !== opts.requestedNetwork) {
-        console.info(
-        `[Seacrest][WalletConnect] Error: connected to "${network}" with accounts ${JSON.stringify(accounts)}, but requested network "${opts.requestedNetwork}". Please change networks and try again.`
-        );
-
-        // Wait 5 seconds to give user a moment to read before another QR code pops in
-        setTimeout(() => connect(resolve, reject, retries), 5000);
-      } else {
-        console.info(
-        `[Seacrest][WalletConnect] Connected to ${network} with accounts ${JSON.stringify(
-            accounts
-          )}`
-        );
-
-        resolve({ signClient, accounts, chainId });
-      }
-    });
-
-    signClient.on("session_update", (error, payload) => {
-      if (error) {
-        reject(error);
-      }
-      const { accounts, chainId } = payload.params[0];
+    signClient.on("session_update", (payload) => {
       console.error(
-        `[Seacrest][WalletConnect] Error: changed session ${JSON.stringify({
-          accounts,
-          chainId,
-        })}`
+        `[Seacrest][WalletConnect] Error: changed session.`
       );
     });
 
-    signClient.on("disconnect", (error, payload) => {
-      if (error) {
-        reject(error);
-      }
+    signClient.on("session_disconnect", (payload) => {
       console.error(`[Seacrest][WalletConnect] Disconnected`);
     });
   }

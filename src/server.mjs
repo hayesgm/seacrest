@@ -80,8 +80,8 @@ async function sendJson(response, json) {
   response.end();
 }
 
-export async function startServer(host, port, walletConnectProjectId, connectOpts={}) {
-  const walletConnectorPromise = getWalletConnector(walletConnectProjectId, host, connectOpts);
+export async function startServer(host, port, walletConnectProjectId, requestedNetwork, connectOpts={}) {
+  const walletConnectorPromise = getWalletConnector(walletConnectProjectId, host, requestedNetwork, connectOpts);
 
   http
     .createServer(async (request, response) => {
@@ -106,8 +106,7 @@ export async function startServer(host, port, walletConnectProjectId, connectOpt
         let { chainId, accounts, walletConnector } =
           await walletConnectorPromise;
         let handlerRes = await handler(
-          chainId,
-          accounts,
+          chainAccounts,
           walletConnector,
           requestJson.params
         );

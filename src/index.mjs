@@ -15,6 +15,14 @@ const walletConnectProjectId = process.argv[4] || process.env["WALLET_CONNECT_PR
 if (!walletConnectProjectId) {
   throw new Error(`Missing required WALLET_CONNECT_PROJECT_ID`);
 }
+let requestedNetwork = process.argv[5] || process.env["REQUESTED_NETWORK"];
+if (!Number.isNaN(requestedNetwork)) {
+  requestedNetwork = Number(requestedNetwork);
+}
+if (!requestedNetwork) {
+  throw new Error(`Missing required REQUESTED_NETWORK`);
+}
+
 let connectOpts = {};
 if (process.env["LARGE"] === "false") {
   connectOpts.large = false;
@@ -22,9 +30,5 @@ if (process.env["LARGE"] === "false") {
 if (process.env["RESHOW_DELAY"]) {
   connectOpts.reshowDelay = Number(process.env["RESHOW_DELAY"]);
 }
-if (process.env["REQUESTED_NETWORK"]) {
-  let n = Number(process.env["REQUESTED_NETWORK"]);
-  connectOpts.requestedNetwork = Number.isNaN(n) ? process.env["REQUESTED_NETWORK"] : n;
-}
 
-startServer(host, port, walletConnectProjectId, connectOpts);
+startServer(host, port, walletConnectProjectId, requestedNetwork, connectOpts);

@@ -11,15 +11,18 @@ inputs:
     default: 8585
   requested_network:
     description: "Requested network to connect to"
+    required: true
+    defualt: 1
   wallet_connect_project_id:
     description: "Your WalletConnect project id"
+    required: true
 runs:
   using: "composite"
   steps:
     - run: |
         cd ${{ github.action_path }}
         npm install
-        LARGE=false RESHOW_DELAY=10000 REQUESTED_NETWORK="${{ inputs.network }}" node src/index.mjs "${{ inputs.ethereum_url }}" "${{ inputs.port }}" &
+        LARGE=false RESHOW_DELAY=10000 REQUESTED_NETWORK="${{ inputs.network }}" node src/index.mjs "${{ inputs.ethereum_url }}" "${{ inputs.port }}" "${{ inputs.wallet_connect_project_id }}" "${{ inputs.requested_network }}" &
         while ! nc -z localhost "${{ inputs.port }}"; do
           sleep 0.1
         done
