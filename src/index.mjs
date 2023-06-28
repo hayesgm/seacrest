@@ -11,16 +11,17 @@ const port = Number(portStr);
 if (Number.isNaN(port)) {
   throw new Error(`Invalid port ${portStr}`);
 }
-const walletConnectProjectId = process.argv[4] || process.env["WALLET_CONNECT_PROJECT_ID"];
-if (!walletConnectProjectId) {
-  throw new Error(`Missing required WALLET_CONNECT_PROJECT_ID`);
-}
-let requestedNetwork = process.argv[5] || process.env["REQUESTED_NETWORK"];
+let requestedNetwork = process.argv[4] || process.env["REQUESTED_NETWORK"];
 if (!Number.isNaN(requestedNetwork)) {
   requestedNetwork = Number(requestedNetwork);
 }
 if (!requestedNetwork) {
   throw new Error(`Missing required REQUESTED_NETWORK`);
+}
+
+const walletConnectProjectId = process.argv[5] || process.env["WALLET_CONNECT_PROJECT_ID"];
+if (!walletConnectProjectId) {
+  throw new Error(`Missing required WALLET_CONNECT_PROJECT_ID`);
 }
 
 let connectOpts = {};
