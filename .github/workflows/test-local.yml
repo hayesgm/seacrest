@@ -19,6 +19,7 @@ jobs:
           ethereum_url: https://goerli.infura.io
           requested_network: 'goerli'
           wallet_connect_project_id: "${{ secrets.WALLET_CONNECT_PROJECT_ID }}"
+          load_pairing: true
           persist_pairing: true
 
       - name: Check Account

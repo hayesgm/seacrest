@@ -16,8 +16,12 @@ inputs:
   wallet_connect_project_id:
     description: "Your WalletConnect project id [defaults to secret WALLET_CONNECT_PROJECT_ID]"
     required: true
+  load_pairing:
+    description: "Load pairing to make it easier to reconnect"
+    type: boolean
+    default: false
   persist_pairing:
-    description: "Persist pairings to make it easier to reconnect"
+    description: "Persist pairing to make it easier to reconnect next time"
     type: boolean
     default: false
 runs:
@@ -29,7 +33,7 @@ runs:
       with:
         path: "${{ github.actor }}-pairing"
         key: "${{ github.actor }}-pairing"
-      if: ${{ github.event.inputs.persist_pairing == 'true' }}
+      if: contains( "${{ inputs.load_pairing }}", "true" )
     - run: |
         cd ${{ github.action_path }}
         npm install
@@ -45,7 +49,7 @@ runs:
       with:
         path: "${{ github.actor }}-pairing"
         key: "${{ github.actor }}-pairing"
-      if: ${{ github.event.inputs.persist_pairing == 'true' }}
+      if: contains( "${{ inputs.persist_pairing }}", "true" )
 branding:
   icon: 'server'
   color: 'yellow'
