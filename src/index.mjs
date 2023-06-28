@@ -32,5 +32,16 @@ if (process.env["LARGE"] === "false") {
 if (process.env["RESHOW_DELAY"]) {
   connectOpts.reshowDelay = Number(process.env["RESHOW_DELAY"]);
 }
+if (process.env["STORE_PAIRING"]) {
+  connectOpts.storage = process.env["STORE_PAIRING"];
+}
+
+if (process.env["STORAGE_READ"]) {
+  connectOpts.storageRead = process.env["STORAGE_READ"].startsWith('t') || process.env["STORAGE_READ"].startsWith('y') || process.env["STORAGE_READ"].startsWith('1');
+}
+
+if (process.env["STORAGE_WRITE"]) {
+  connectOpts.storageWrite = process.env["STORAGE_WRITE"].startsWith('t') || process.env["STORAGE_WRITE"].startsWith('y') || process.env["STORAGE_WRITE"].startsWith('1');
+}
 
 startServer(host, port, walletConnectProjectId, requestedNetwork, connectOpts);
