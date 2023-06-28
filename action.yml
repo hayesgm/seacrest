@@ -23,7 +23,7 @@ runs:
   using: "composite"
   steps:
     - name: Restore Pairing
-      id: walletconnect-pairing
+      id: walletconnect-pairing-restore
       uses: actions/cache/restore@v3
       with:
         path: "${{ github.actor }}-pairing"
@@ -39,7 +39,7 @@ runs:
         curl -S -s -i "http://localhost:${{ inputs.port }}" -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":1}'
       shell: bash
     - name: Persist Pairing
-      id: walletconnect-pairing
+      id: walletconnect-pairing-save
       uses: actions/cache/save@v3
       with:
         path: "${{ github.actor }}-pairing"
