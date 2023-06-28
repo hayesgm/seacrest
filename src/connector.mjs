@@ -42,13 +42,13 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
 
     let storage;
     let topic;
-    console.log({CORE_STORAGE_OPTIONS, KeyValueStorage});
+
     if (opts.storage && opts.storageRead) {
       let storageData;
       try {
         storageData = JSON.parse(fs.readFileSync(opts.storage));
       } catch (e) {
-        console.error(`Error reading storage at ${opts.storage}: ${e}`);
+        console.error(`[Seacrest][WalletConnect] Error reading storage at ${opts.storage}: ${e}`);
       }
       if (storageData !== undefined) {
         let pairing = storageData.find(([k, v]) => k.endsWith('//pairing'));
@@ -60,11 +60,8 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
       }
     }
 
-    console.log({storage, topic});
-
     const signClient = new SignClient.default(
       {
-        pairingTopic: topic,
         projectId: walletConnectProjectId,
         storage,
         metadata: {
@@ -103,11 +100,9 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
     }
 
     signClient.initialize().then(() => {
-      signClient.core.storage.getEntries().then(async (e) => {
-        console.log("entries", e);
-      });
       // Create new session
       signClient.connect({
+        pairingTopic: topic,
         // Provide the namespaces and chains (e.g. `eip155` for EVM-based chains) we want to use in this session.
         requiredNamespaces: {
           eip155: {
@@ -152,8 +147,7 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
               )}`
             );
 
-            // TODO: Only if connected via URL
-            if (opts.storage && opts.storageWrite) {
+            if (!topic && opts.storage && opts.storageWrite) {
               signClient.core.storage.getEntries().then(async (e) => {
                 console.log(`Storing pairing entries to ${opts.storage}`);
                 await fs.promises.writeFile(opts.storage, JSON.stringify(e));

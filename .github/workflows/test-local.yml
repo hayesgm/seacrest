@@ -2,6 +2,7 @@ name: Test Local Action
 
 on:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   check:
@@ -18,6 +19,7 @@ jobs:
           ethereum_url: https://goerli.infura.io
           requested_network: 'goerli'
           wallet_connect_project_id: "${{ secrets.WALLET_CONNECT_PROJECT_ID }}"
+          persist_pairing: true
 
       - name: Check Account
         run: |
