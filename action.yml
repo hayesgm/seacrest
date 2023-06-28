@@ -31,7 +31,7 @@ runs:
       id: walletconnect-pairing-restore
       uses: actions/cache/restore@v3
       with:
-        path: "${{ github.actor }}-pairing"
+        path: "./${{ github.actor }}-pairing"
         key: "${{ github.actor }}-pairing"
       if: contains( "${{ inputs.load_pairing }}", "true" )
     - run: |
@@ -47,7 +47,7 @@ runs:
       id: walletconnect-pairing-save
       uses: actions/cache/save@v3
       with:
-        path: "${{ github.actor }}-pairing"
+        path: "./${{ github.actor }}-pairing"
         key: "${{ github.actor }}-pairing"
       if: contains( "${{ inputs.persist_pairing }}", "true" )
 branding:
