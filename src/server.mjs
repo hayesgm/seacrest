@@ -13,16 +13,16 @@ async function eth_sendTransaction(
   return await walletConnector.sendTransaction(tx);
 }
 
-async function net_version(session, chainId, accounts, walletConnector, []) {
+async function net_version(signClient, session, chainId, accounts, walletConnector, []) {
   return chainId;
 }
 
-async function eth_accounts(session, chainId, accounts, walletConnector, []) {
+async function eth_accounts(signClient, session, chainId, accounts, walletConnector, []) {
   return accounts;
 }
 
-async function personal_sign(session, chainId, accounts, walletConnector, params) {
-  let x = await signClient.request({
+async function personal_sign(signClient, session, chainId, accounts, walletConnector, params) {
+  return await signClient.request({
     topic: session.topic,
     chainId: `eip155:${chainId}`,
     request: {
@@ -30,8 +30,6 @@ async function personal_sign(session, chainId, accounts, walletConnector, params
       params: params.length === 1 ? [params[0], accounts[0]] : params,
     }
   });
-  console.log({x});
-  return x;
 }
 
 const rpcFuncs = {
@@ -109,9 +107,10 @@ export async function startServer(host, port, walletConnectProjectId, requestedN
       if (handler) {
         console.info(`[Seacrest][HTTP] Intercepting ${rpcMethod} request...`);
 
-        let { session, chainId, accounts, walletConnector } =
+        let { signClient, session, chainId, accounts, walletConnector } =
           await walletConnectorPromise;
         let handlerRes = await handler(
+          signClient,
           session,
           chainId,
           accounts,
