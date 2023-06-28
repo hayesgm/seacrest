@@ -23,3 +23,4 @@ jobs:
         run: |
           curl -i http://localhost:8585 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"eth_accounts","params":[],"id":2}'
           curl -i http://localhost:8585 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"net_version","params":[],"id":3}'
+          curl -i http://localhost:8585 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"personal_sign","params":["0x112233"],"id":3}'
