@@ -1,4 +1,7 @@
+import * as fs from 'fs';
 import SignClient from '@walletconnect/sign-client'
+import { CORE_STORAGE_OPTIONS } from '@walletconnect/core'
+import { KeyValueStorage } from '@walletconnect/keyvaluestorage'
 import qrcode from "qrcode-terminal";
 
 const networks = {
@@ -12,6 +15,9 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
     uriTimeout: 120000,
     retries: 10,
     large: true,
+    storage: null,
+    storageRead: true,
+    storageWrite: true,
     ...connectOpts
   };
 
@@ -34,9 +40,30 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
     let reshowTimer = null;
     let attempted = false;
 
+    let storage;
+    let topic;
+
+    if (opts.storage && opts.storageRead) {
+      let storageData;
+      try {
+        storageData = JSON.parse(fs.readFileSync(opts.storage));
+      } catch (e) {
+        console.error(`[Seacrest][WalletConnect] Error reading storage at ${opts.storage}: ${e}`);
+      }
+      if (storageData !== undefined) {
+        let pairing = storageData.find(([k, v]) => k.endsWith('//pairing'));
+        topic = pairing?.[1]?.[0]?.topic;
+        storage = new KeyValueStorage({ ...CORE_STORAGE_OPTIONS, ...opts?.storageOptions });
+        for (let [k, v] of storageData) {
+          storage.setItem(k, v);
+        }
+      }
+    }
+
     const signClient = new SignClient.default(
       {
         projectId: walletConnectProjectId,
+        storage,
         metadata: {
           description: "WalletConnect GitHub Action",
           url: "https://github.com/hayesgm/seacrest",
@@ -75,6 +102,7 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
     signClient.initialize().then(() => {
       // Create new session
       signClient.connect({
+        pairingTopic: topic,
         // Provide the namespaces and chains (e.g. `eip155` for EVM-based chains) we want to use in this session.
         requiredNamespaces: {
           eip155: {
@@ -114,19 +142,31 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
               )}`
             );
 
+            if (!topic && opts.storage && opts.storageWrite) {
+              signClient.core.storage.getEntries().then(async (e) => {
+                console.log(`Storing pairing entries to ${opts.storage}`);
+                fs.writeFileSync(opts.storage, JSON.stringify(e));
+                console.log(`Stored pairing entries to ${opts.storage}`);
+              })
+            }
+
             resolve({ signClient, session, chainId: requestedNetwork, accounts });
           }
         });
         
-        if (uri) {
-          showUntilAttempted(uri);
-        } else {
-          console.error(`[Seacrest][WalletConnect] Error: No uri returned: uri=${uri}, approval=${approval}`);
+        // TODO: When to invalidate topic?
+        if (!topic) {
+          if (uri) {
+            showUntilAttempted(uri);
+          } else {
+            console.error(`[Seacrest][WalletConnect] Error: No uri returned: uri=${uri}, approval=${approval}`);
+          }
         }
       });
     });
 
     signClient.on("session_update", (payload) => {
+      console.log("payload", payload);
       console.error(
         `[Seacrest][WalletConnect] Error: changed session.`
       );
