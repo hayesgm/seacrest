@@ -166,6 +166,7 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
     });
 
     signClient.on("session_update", (payload) => {
+      console.log("payload", payload);
       console.error(
         `[Seacrest][WalletConnect] Error: changed session.`
       );
