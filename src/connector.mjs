@@ -145,7 +145,7 @@ export async function getWalletConnector(walletConnectProjectId, relayUrl, reque
             if (!topic && opts.storage && opts.storageWrite) {
               signClient.core.storage.getEntries().then(async (e) => {
                 console.log(`Storing pairing entries to ${opts.storage}`);
-                await fs.promises.writeFile(opts.storage, JSON.stringify(e));
+                fs.writeFile(opts.storage, JSON.stringify(e));
                 console.log(`Stored pairing entries to ${opts.storage}`);
               })
             }
