@@ -31,13 +31,13 @@ runs:
       id: walletconnect-pairing-restore
       uses: actions/cache/restore@v3
       with:
-        path: "./${{ github.actor }}-pairing"
+        path: "${{ github.actor }}-pairing"
         key: "${{ github.actor }}-pairing"
       if: contains( "${{ inputs.load_pairing }}", "true" )
     - run: |
         cd ${{ github.action_path }}
         npm install
-        STORE_PAIRING="./${{ github.actor }}-pairing" LARGE=false RESHOW_DELAY=10000 node src/index.mjs "${{ inputs.requested_network }}" "${{ inputs.wallet_connect_project_id }}" "${{ inputs.ethereum_url }}" "${{ inputs.port }}" &
+        STORE_PAIRING="${{ github.actor }}-pairing" LARGE=false RESHOW_DELAY=10000 node src/index.mjs "${{ inputs.requested_network }}" "${{ inputs.wallet_connect_project_id }}" "${{ inputs.ethereum_url }}" "${{ inputs.port }}" &
         while ! nc -z localhost "${{ inputs.port }}"; do
           sleep 0.1
         done
@@ -47,7 +47,7 @@ runs:
       id: walletconnect-pairing-save
       uses: actions/cache/save@v3
       with:
-        path: "./${{ github.actor }}-pairing"
+        path: "${{ github.actor }}-pairing"
         key: "${{ github.actor }}-pairing"
       if: contains( "${{ inputs.persist_pairing }}", "true" )
 branding:
