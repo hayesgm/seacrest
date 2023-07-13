@@ -13,19 +13,23 @@ async function eth_sendTransaction(
   return await walletConnector.sendTransaction(tx);
 }
 
-async function net_version(chainId, accounts, walletConnector, []) {
+async function net_version(signClient, session, chainId, accounts, walletConnector, []) {
   return chainId;
 }
 
-async function eth_accounts(chainId, accounts, walletConnector, []) {
+async function eth_accounts(signClient, session, chainId, accounts, walletConnector, []) {
   return accounts;
 }
 
-async function personal_sign(chainId, accounts, walletConnector, [message, account]) {
-  return await walletConnector.signPersonalMessage([
-    message,
-    account
-  ]);
+async function personal_sign(signClient, session, chainId, accounts, walletConnector, params) {
+  return await signClient.request({
+    topic: session.topic,
+    chainId: `eip155:${chainId}`,
+    request: {
+      method: "personal_sign",
+      params: params.length === 1 ? [params[0], accounts[0]] : params,
+    }
+  });
 }
 
 const rpcFuncs = {
@@ -80,8 +84,8 @@ async function sendJson(response, json) {
   response.end();
 }
 
-export async function startServer(host, port, connectOpts={}) {
-  const walletConnectorPromise = getWalletConnector(connectOpts);
+export async function startServer(host, port, walletConnectProjectId, requestedNetwork, connectOpts={}) {
+  const walletConnectorPromise = getWalletConnector(walletConnectProjectId, host, requestedNetwork, connectOpts);
 
   http
     .createServer(async (request, response) => {
@@ -103,9 +107,11 @@ export async function startServer(host, port, connectOpts={}) {
       if (handler) {
         console.info(`[Seacrest][HTTP] Intercepting ${rpcMethod} request...`);
 
-        let { chainId, accounts, walletConnector } =
+        let { signClient, session, chainId, accounts, walletConnector } =
           await walletConnectorPromise;
         let handlerRes = await handler(
+          signClient,
+          session,
           chainId,
           accounts,
           walletConnector,

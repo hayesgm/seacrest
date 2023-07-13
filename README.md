@@ -3,7 +3,7 @@
 <img src="https://github.com/hayesgm/seacrest/raw/main/logo.png" width="100">
 
 ----
-Seacrest allows you to connect with WalletConnect from your terminal or GitHub Action.
+Seacrest allows you to connect with WalletConnect 2.0 from your terminal or GitHub Action.
 
 You start Seacrest either in a terminal or as a GitHub Action. In either case, you'll see a QR Code in your terminal after Seacrest starts [like literally, in your terminal or in the GitHub Actions logs]. Connect any WalletConnect app (e.g. [MetaMask Mobile](https://apps.apple.com/us/app/metamask-blockchain-wallet/id1438144202)) to that QR Code. From then on out, point your apps to the Ethereum node `https://localhost:8585`. For standard requests, like the current block number, Seacrest proxies the request to an Ethereum node you specify. But for requests for unlocked accounts or signing transactions, Seacrest will forward the request to your WalletConnect app. Magically, you'll have an "unlocked account" available to use with Hardhat or any other Ethereum tool.
 
@@ -20,7 +20,7 @@ npm install -g seacrest
 Next, run seacrest, specifying an Ethereum node to proxy requests to:
 
 ```sh
-seacrest http://goerli.infura.io 8585
+seacrest {ethereum_network} {wallet_connect_project_id} http://goerli.infura.io 8585
 ```
 
 Now, you can specify `http://localhost:8585` as your Ethereum node in any service. If that service calls `eth_accounts`, `eth_sendTransaction`, `net_version`, or `personal_sign`, that request will be intercepted by Seacrest and passed to WalletConnect. Otherwise, the request will be proxied the given Ethereum node.
@@ -33,6 +33,8 @@ Seacrest is also meant to be easily used in a GitHub Action. Add to your YAML fi
 - name: Seacrest
   uses: hayesgm/seacrest@v1
   with:
+    wallet_connect_project_id: '...'
+    requested_network: 'goerli' # or 5
     ethereum_url: https://goerli.infura.io # optional, otherwise mainnet
     port: 8585 # default 8585
 ```
@@ -49,7 +51,6 @@ You can configure the following values from the environment:
 * `PORT`: Port to bind on
 * `LARGE`: Show full size QR code or compact
 * `RESHOW_DELAY`: Reshow the QR code every so often (used in GitHub Actions)
-* `REQUESTED_NETWORK`: Network to try to connect with- will fail if user connects to wrong network.
 
 ## Why?
 
