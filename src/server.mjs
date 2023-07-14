@@ -5,12 +5,21 @@ import fetch from "node-fetch";
 import { getWalletConnector } from "./connector.mjs";
 
 async function eth_sendTransaction(
+  signClient,
+  session,
   chainId,
   accounts,
   walletConnector,
   [tx]
 ) {
-  return await walletConnector.sendTransaction(tx);
+  return await await signClient.request({
+    topic: session.topic,
+    chainId: `eip155:${chainId}`,
+    request: {
+      method: "eth_sendTransaction",
+      params: [ tx ],
+    },
+  })
 }
 
 async function net_version(signClient, session, chainId, accounts, walletConnector, []) {
