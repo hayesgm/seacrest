@@ -3,7 +3,14 @@ import qrcode from "qrcode-terminal";
 
 const networks = {
   'mainnet': 1,
-  'goerli': 5
+  'goerli': 5, 
+  'fuji': 43113,
+  'mumbai': 80001,
+  'polygon': 137,
+  'arbitrum': 42161,
+  'arbitrum-goerli': 421613,
+  'base-goerli': 84531,
+  'linea-goerli': 59140,
 };
 
 export async function getWalletConnector(walletConnectProjectId, relayUrl, requestedNetwork, connectOpts={}) {
