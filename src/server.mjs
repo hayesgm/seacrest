@@ -12,7 +12,6 @@ async function eth_sendTransaction(
   walletConnector,
   [tx]
 ) {
-  // return await walletConnector.sendTransaction(tx);
   return await await signClient.request({
     topic: session.topic,
     chainId: `eip155:${chainId}`,
