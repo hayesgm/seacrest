@@ -16,7 +16,7 @@ jobs:
         uses: ./
         with:
           ethereum_url: https://goerli.infura.io
-          requested_network: 'goerli'
+          requested_network: 'arbitrum-goerli'
           wallet_connect_project_id: "${{ secrets.WALLET_CONNECT_PROJECT_ID }}"
 
       - name: Check Account
