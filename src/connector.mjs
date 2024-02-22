@@ -4,6 +4,7 @@ import qrcode from "qrcode-terminal";
 const networks = {
   'mainnet': 1,
   'goerli': 5,
+  'sepolia': 11155111,
   'fuji': 43113,
   'mumbai': 80001,
   'polygon': 137,
