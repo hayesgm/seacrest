@@ -12,6 +12,7 @@ const networks = {
   'arbitrum-goerli': 421613,
   'base': 8453,
   'base-goerli': 84531,
+  'base-sepolia': 84532,
   'linea': 59144,
   'linea-goerli': 59140,
 };
