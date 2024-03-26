@@ -57,12 +57,11 @@ function getReqBody(req) {
   });
 }
 
-async function proxy(host, request, reqBody, response) {
+async function proxy(host, request, reqBody) {
   let pathname = url.parse(request.url).pathname;
   pathname = pathname === "/" ? "" : pathname; // to avoid a trailing slash
   let hostname = url.parse(host).host;
   let proxyUrl = `${host}${pathname}`;
-  let reqMethod = request.method;
   let reqHeaders = {
     ...request.headers,
     host: hostname,
@@ -74,23 +73,42 @@ async function proxy(host, request, reqBody, response) {
     body: reqBody,
   });
 
-  let headers = Object.fromEntries(
-    Object.entries([...result.headers]).filter(([name, value]) => {
-      return name.toLowerCase() === "content-type";
-    })
-  );
-
-  let resData = new Uint8Array(await result.arrayBuffer());
-
-  response.writeHead(result.status, headers);
-  response.write(resData);
-  response.end();
+  return new TextDecoder().decode(await result.arrayBuffer());
 }
 
 async function sendJson(response, json) {
   response.writeHead(200, { "content-type": "application/json" });
   response.write(JSON.stringify(json));
   response.end();
+}
+
+async function handleIndividualRequest(
+  host,
+  request,
+  walletConnectorPromise,
+  requestJson
+) {
+  let rpcMethod = requestJson.method ?? null;
+  let handler = rpcFuncs[rpcMethod];
+  if (!handler) {
+    console.info(`[Seacrest][HTTP] Proxying ${rpcMethod} request...`);
+    return JSON.parse(await proxy(host, request, JSON.stringify(requestJson)));
+  } else {
+    console.info(`[Seacrest][HTTP] Intercepting ${rpcMethod} request...`);
+
+    let { signClient, session, chainId, accounts, walletConnector } =
+      await walletConnectorPromise;
+    let handlerRes = await handler(
+      signClient,
+      session,
+      chainId,
+      accounts,
+      walletConnector,
+      requestJson.params
+    );
+
+    return { jsonrpc: "2.0", id: requestJson.id, result: handlerRes };
+  }
 }
 
 export async function startServer(host, port, walletConnectProjectId, requestedNetwork, connectOpts={}) {
@@ -110,32 +128,23 @@ export async function startServer(host, port, walletConnectProjectId, requestedN
         return;
       }
 
-      let rpcMethod = requestJson.method ?? null;
-      let handler = rpcFuncs[rpcMethod];
-
-      if (handler) {
-        console.info(`[Seacrest][HTTP] Intercepting ${rpcMethod} request...`);
-
-        let { signClient, session, chainId, accounts, walletConnector } =
-          await walletConnectorPromise;
-        let handlerRes = await handler(
-          signClient,
-          session,
-          chainId,
-          accounts,
-          walletConnector,
-          requestJson.params
-        );
-
-        await sendJson(response, {
-          id: requestJson.id,
-          jsonrpc: "2.0",
-          result: handlerRes,
-        });
-      } else {
-        console.info(`[Seacrest][HTTP] Proxying ${rpcMethod} request...`);
-        await proxy(host, request, reqBody, response);
+      if (!Array.isArray(requestJson)) {
+        requestJson = [requestJson];
       }
+
+      let reqResponses = [];
+      for (let req of requestJson) {
+        reqResponses.push(
+          await handleIndividualRequest(
+            host,
+            request,
+            walletConnectorPromise,
+            req
+          )
+        );
+      }
+
+      await sendJson(response, reqResponses);
     })
     .listen(port);
 
