@@ -15,6 +15,7 @@ const networks = {
   'base-sepolia': 84532,
   'linea': 59144,
   'linea-goerli': 59140,
+  'scroll': 534352
 };
 
 export async function getWalletConnector(walletConnectProjectId, relayUrl, requestedNetwork, connectOpts={}) {
